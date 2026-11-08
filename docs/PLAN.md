@@ -1,0 +1,7 @@
+# Virtual robot wet-lab prototype
+
+The included prototype provides a FastAPI/SQLite booking and job queue, a Python SDK compiled to a protocol IR, a CPU kinematics/planning twin, synthetic camera rendering, and virtual arm/door/instrument drivers. The simulated runtime records results and exposes metering previews. `lab/cell-a.yaml` is synthetic, nominal geometry, not a drawing of any actual room or a calibrated cell.
+
+The virtual safety interlock latches on door-open/E-stop/camera-loss in tests. It is **not** a safety-rated control system. No physical wet lab has been commissioned, and real driver stubs are not validated. Any actual arm requires a site-specific risk assessment, qualified engineering, hardware safety chain, guarding, validation and independent approval; never let the example configuration command a real arm. Subprocess SDK compilation does not isolate networks; only trusted local programs may use that backend. Docker is the default backend for untrusted programs.
+
+Source layout: `wetlab/spec.py` and `geometry.py` model the cell; `wetlab/ir.py` and `plan.py` compile and plan protocols; `wetlab/twin/` houses the CPU renderer, planner and optional USD generator; `wetlab/hw/` contains virtual drivers and real-driver stubs; `wetlab/service/` provides bookings, jobs, local API-key auth and console; `isaac/` has optional scripts requiring the user's separately installed Isaac Sim 5.1 and its licensed assets. See [`twin.md`](twin.md) and the root README for install and safety details.

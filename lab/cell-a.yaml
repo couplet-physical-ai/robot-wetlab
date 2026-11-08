@@ -1,0 +1,98 @@
+# SYNTHETIC example geometry only: not surveyed, not a real building or laboratory plan.
+# This nominal virtual cell is not safe or calibrated for real hardware.
+#
+# Frame "room": origin on the floor at the inside south-west corner, +X east along the
+# south wall, +Y north, +Z up. Metres, degrees. rpy_deg = [roll, pitch, yaw], R = Rz(yaw) Ry(pitch) Rx(roll).
+# Status: NOMINAL (synthetic values). A real cell needs its own surveyed spec.
+id: cell-a
+name: "Wet lab cell A"
+survey: {status: nominal, date: "2026-11-04", by: "design"}
+
+room:
+  size: [4.0, 3.0, 2.7]          # inside dimensions x, y, z
+  wall_thickness: 0.12
+
+doors:
+  - id: door-1
+    wall: south                   # south (y=0) | north | west (x=0) | east
+    hinge_x: 0.40                 # hinge position along the wall (room x for south/north walls, room y for west/east)
+    width: 0.90
+    height: 2.10
+    thickness: 0.045
+    swing: outward                # outward = into the corridor, away from the arm
+    hinge_side: left              # panel extends from the hinge toward +along-wall
+    max_open_deg: 95
+    interlock: {switch: "guard-lock-1", lock: "guard-lock-1"}   # virtual interlock ids
+
+benches:
+  - id: bench-1
+    pose: {xyz: [2.0, 2.55, 0.0], rpy_deg: [0, 0, 0]}   # centre of the footprint, on the floor
+    size: [1.80, 0.80, 0.90]      # x, y, height (top at z = 0.90)
+
+arms:
+  - id: arm-1
+    model: ur5e
+    mount: bench-1
+    base: {xyz: [2.0, 2.80, 0.90], rpy_deg: [0, 0, 90]}   # UR controller "base" frame (DH base) in room frame
+    tool:
+      model: plate_gripper        # parallel gripper with SBS plate fingers (synthetic)
+      tcp_offset_m: 0.200         # flange -> TCP (finger pads centre) along tool z
+      open_mm: 110
+      max_payload_kg: 1.0
+    home_q_deg: [0, -100, 100, -90, -90, 0]
+    limits:
+      tcp_speed_mps: 0.25         # collaborative speed cap, mirrored by a UR safety limit
+      joint_speed_dps: 60
+      joint_accel_dps2: 120
+
+# Plate nests (SBS footprint, locating pins) and instrument nests. `top` = z of the nest surface.
+locations:
+  - {id: nest-A1, kind: nest, xy: [1.45, 2.55], top: 0.90, yaw_deg: 0}
+  - {id: nest-A2, kind: nest, xy: [1.70, 2.32], top: 0.90, yaw_deg: 0}
+  - {id: nest-B1, kind: nest, xy: [2.30, 2.32], top: 0.90, yaw_deg: 0}
+  - {id: nest-B2, kind: nest, xy: [2.55, 2.55], top: 0.90, yaw_deg: 0}
+  - {id: shaker-1, kind: instrument, xy: [2.00, 2.25], top: 0.98, yaw_deg: 0,
+     body: {size: [0.17, 0.12, 0.08]}, driver: sim_shaker}
+
+labware_types:
+  sbs_96_wellplate:   # ANSI/SLAS 1-2004 footprint
+    size: [0.12776, 0.08548, 0.01435]
+    wells: {rows: 8, cols: 12, pitch: 0.009, a1_offset: [0.01438, 0.01124], depth: 0.01067}
+    grip: {width_mm: 82, z_from_top: 0.006}
+  sbs_96_deepwell:
+    size: [0.12776, 0.08548, 0.0415]
+    wells: {rows: 8, cols: 12, pitch: 0.009, a1_offset: [0.01438, 0.01124], depth: 0.0390}
+    grip: {width_mm: 82, z_from_top: 0.008}
+
+labware:
+  - {id: plate-1, type: sbs_96_wellplate, at: nest-A1}
+  - {id: plate-2, type: sbs_96_deepwell, at: nest-A2}
+
+cameras:
+  - id: cam-overview
+    model: synthetic fixed-lens camera
+    resolution: [1280, 720]
+    fps: 15
+    # OpenCV pinhole model. NOMINAL until calibrated with the ChArUco board (tools: docs/twin.md).
+    intrinsics: {fx: 760.0, fy: 760.0, cx: 640.0, cy: 360.0, dist: [-0.12, 0.03, 0.0, 0.0, 0.0]}
+    # Extrinsics: camera position + look-at in room frame (nominal). A calibration replaces
+    # this with quat_wxyz (OpenCV optical frame: x right, y down, z forward) + position.
+    extrinsics: {position: [0.55, 0.45, 2.30], look_at: [2.0, 2.45, 0.95]}
+    calibration: {status: nominal}
+
+keepouts:
+  # The arm must stay over the bench: nothing may cross into the room/aisle side.
+  - {id: aisle, min: [0.0, 0.0, 0.0], max: [4.0, 2.05, 2.7]}
+
+safety:
+  require_door_closed_and_locked: true
+  stop_on_camera_loss_s: 2.0
+  blank_stream_when_door_open: true     # staff in the room are never streamed to renters
+  min_clearance_m: 0.01
+
+billing:   # USD; hooks only, see wetlab/billing.py
+  slot_minute: 2.00
+  arm_second: 0.0
+  sim_dry_run: 0.25
+  isaac_minute: 0.10
+  cancel_refund_hours: 24

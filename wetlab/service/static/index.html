@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wet lab console</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- sign-in -->
+  <main id="signin" class="signin" hidden>
+    <form id="signin-form" class="card signin-card">
+      <img src="favicon.svg" alt="" class="logo-lg">
+      <h1>Wet lab console</h1>
+      <p class="muted">Rent robot-arm time: book a slot, dry-run your protocol in the twin, run it on the virtual cell, download the results.</p>
+      <label class="field">API key
+        <input id="key-input" type="password" autocomplete="off" placeholder="wl_…" required>
+      </label>
+      <button class="btn primary" type="submit">Sign in</button>
+      <p id="signin-error" class="error" hidden></p>
+    </form>
+  </main>
+
+  <!-- console -->
+  <div id="app" hidden>
+    <header class="topbar">
+      <img src="favicon.svg" alt="" class="logo">
+      <div class="cellname"><span id="cell-name">—</span><span id="cell-mode" class="tag">virtual cell</span></div>
+      <div id="chips" class="chips" aria-live="polite"></div>
+      <div class="who"><span id="who"></span><button id="signout" class="btn ghost sm" type="button">Sign out</button></div>
+    </header>
+
+    <div class="grid">
+      <section class="col-live">
+        <div class="card cam">
+          <div class="cam-frame" id="cam-frame">
+            <img id="cam-img" alt="Live cell camera">
+            <div id="cam-placeholder" class="cam-placeholder">
+              <div class="ph-icon" aria-hidden="true"></div>
+              <strong id="ph-title">No active booking</strong>
+              <span id="ph-sub">The live camera opens during your booked slot.</span>
+              <button class="btn sm" type="button" data-goto="book">Book a slot</button>
+            </div>
+            <span id="cam-live" class="live-badge" hidden>LIVE</span>
+          </div>
+          <div class="cam-foot"><span id="cam-meta">camera</span><span id="cam-note" class="muted"></span></div>
+        </div>
+
+        <div class="card state">
+          <div class="state-head">
+            <h2>Cell state</h2>
+            <span id="state-src" class="muted sm"></span>
+          </div>
+          <div id="job-live" class="job-live"></div>
+          <table class="joints" id="joints"></table>
+          <dl class="kv" id="state-kv"></dl>
+        </div>
+
+        <div class="card operator" id="operator" hidden>
+          <div class="state-head"><h2>Operator</h2><span class="muted sm">door · E-stop · interlock</span></div>
+          <div class="op-row">
+            <button class="btn" data-door="open" type="button">Open door</button>
+            <button class="btn" data-door="close" type="button">Close door</button>
+            <button class="btn" data-door="lock" type="button">Lock</button>
+            <button class="btn" data-door="unlock" type="button">Unlock</button>
+          </div>
+          <div class="op-row">
+            <button class="btn estop" id="estop" type="button">E-STOP</button>
+            <button class="btn primary" id="reset" type="button">Reset interlock</button>
+          </div>
+          <p id="op-msg" class="muted sm"></p>
+        </div>
+      </section>
+
+      <section class="col-work card">
+        <nav class="tabs" role="tablist">
+          <button role="tab" data-tab="book" type="button">Book</button>
+          <button role="tab" data-tab="submit" type="button">Submit</button>
+          <button role="tab" data-tab="jobs" type="button">Jobs</button>
+          <button role="tab" data-tab="usage" type="button">Usage</button>
+        </nav>
+
+        <div class="tabpane" id="tab-book" hidden>
+          <div class="row between">
+            <label class="inline">Day (UTC) <input id="book-date" type="date"></label>
+            <span class="legend"><i class="sw free"></i>free <i class="sw mine"></i>mine <i class="sw taken"></i>taken</span>
+          </div>
+          <div id="slots" class="slots"></div>
+          <div class="row between book-bar">
+            <span id="book-sel" class="muted">Click a start slot, then an end slot.</span>
+            <button id="book-btn" class="btn primary" type="button" disabled>Book</button>
+          </div>
+          <h3>My bookings</h3>
+          <div id="bookings" class="list"></div>
+        </div>
+
+        <div class="tabpane" id="tab-submit" hidden>
+          <div class="row wrap">
+            <label class="inline">Booking <select id="sub-booking"></select></label>
+            <div class="seg" role="group" aria-label="Program kind">
+              <button type="button" data-kind="python" class="on">Python SDK</button>
+              <button type="button" data-kind="ir">IR JSON</button>
+            </div>
+          </div>
+          <textarea id="source" spellcheck="false" aria-label="Protocol source"></textarea>
+          <div class="row">
+            <button id="dry-btn" class="btn" type="button">Dry-run</button>
+            <button id="run-btn" class="btn primary" type="button">Run on cell</button>
+            <span id="sub-msg" class="muted sm"></span>
+          </div>
+          <div id="sub-result"></div>
+        </div>
+
+        <div class="tabpane" id="tab-jobs" hidden>
+          <div id="job-detail"></div>
+          <div id="jobs" class="list"></div>
+        </div>
+
+        <div class="tabpane" id="tab-usage" hidden>
+          <div class="tiles" id="usage-tiles"></div>
+          <h3>Invoice lines</h3>
+          <table class="tbl" id="invoice"></table>
+          <h3>Meter events</h3>
+          <table class="tbl" id="events"></table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="assertive"></div>
+  <script src="app.js"></script>
+</body>
+</html>
