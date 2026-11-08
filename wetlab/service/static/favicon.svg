@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Wet lab cell">
+  <rect width="64" height="64" rx="10" fill="#236397"/>
+  <rect x="10" y="40" width="44" height="12" rx="2" fill="#e2e8f0"/>
+  <path d="M20 40v-13l13-10 12 11-8 12" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="20" cy="26" r="4" fill="#98c9e5"/>
+  <circle cx="33" cy="17" r="4" fill="#98c9e5"/>
+</svg>

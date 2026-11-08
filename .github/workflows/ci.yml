@@ -1,0 +1,21 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v5
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: uv sync --python 3.12
+      # Docker-only sandbox cases skip if the daemon or preloaded public image is unavailable.
+      # Neither Isaac Sim nor hardware or private services are installed here.
+      - run: timeout 600s uv run pytest -q -rs

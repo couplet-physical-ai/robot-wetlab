@@ -1,0 +1,16 @@
+{
+  "ir_version": "wetlab.ir/1",
+  "name": "demo: shake plate-1, image it, put it back, visit plate-2 A1",
+  "cell": "cell-a",
+  "steps": [
+    {"op": "home"},
+    {"op": "pick", "labware": "plate-1"},
+    {"op": "place", "labware": "plate-1", "at": "shaker-1"},
+    {"op": "instrument", "instrument": "shaker-1", "action": "shake", "params": {"seconds": 3, "rpm": 600}},
+    {"op": "capture", "tag": "after-shake"},
+    {"op": "pick", "labware": "plate-1"},
+    {"op": "place", "labware": "plate-1", "at": "nest-A1"},
+    {"op": "move_to", "target": {"labware": "plate-2", "well": "A1", "z_above": 0.03}},
+    {"op": "home"}
+  ]
+}

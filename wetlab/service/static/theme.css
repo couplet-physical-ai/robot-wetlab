@@ -1,0 +1,19 @@
+/* Neutral console palette; no external fonts or brand assets. */
+:root {
+  --ui-accent: #236397;
+  --ui-danger: #ad3030;
+  --ui-warning: #966619;
+  --ui-neutral-900: #17212b;
+  --ui-neutral-800: #233242;
+  --ui-neutral-700: #334155;
+  --ui-neutral-600: #475569;
+  --ui-neutral-500: #64748b;
+  --ui-neutral-400: #94a3b8;
+  --ui-neutral-300: #cbd5e1;
+  --ui-neutral-200: #e2e8f0;
+  --ui-neutral-100: #f8fafc;
+  --ui-white: #fff;
+  --ui-border: var(--ui-neutral-200);
+  --ui-muted-fg: var(--ui-neutral-500);
+  --ui-font-sans: system-ui, -apple-system, sans-serif;
+}
