@@ -39,6 +39,9 @@ jobs:
                   ['git', 'show', '-s', '--format=%an%n%ae%n%B', sha], text=True
               )
               name, email, body = raw.split('\n', 2)
+              # Bot commits (Dependabot, github-actions) can't sign off; DCO covers human contributors.
+              if name.endswith('[bot]') and email.casefold().endswith('@users.noreply.github.com'):
+                  continue
               trailers = re.findall(r'^Signed-off-by:\s*(.+?)\s*<([^<>]+)>\s*$', body, re.I | re.M)
               if not any(n.strip() == name and e.casefold() == email.casefold()
                          for n, e in trailers):
